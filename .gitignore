@@ -3,11 +3,11 @@
 # .gitignore - List of files to prevent from tracking in repo
 #
 # @version     3.1.0
-# @package     wp_theme_lyquix
+# @package     wp_theme_lyquix_child
 # @author      lyquix
 # @copyright   Copyright (C) 2015 - 2024 Lyquix
 # @license     GNU General Public License version 2 or later
-# @link        https://github.com/lyquix/wp_theme_lyquix
+# @link        https://github.com/lyquix/wp_theme_lyquix_child
 #
 ###
 
@@ -18,7 +18,7 @@ Desktop.ini
 *Zone.Identifier
 .idea
 
-# gitignore for wp_theme_lyquix
+# gitignore for wp_theme_lyquix_child
 /.sass-cache
 node_modules
 bun.lockb

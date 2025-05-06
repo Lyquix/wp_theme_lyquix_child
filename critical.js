@@ -2,11 +2,11 @@
  * critical.js - Generate Critical Path CSS
  *
  * @version     3.1.0
- * @package     wp_theme_lyquix
+ * @package     wp_theme_lyquix_child
  * @author      Lyquix
  * @copyright   Copyright (C) 2015 - 2024 Lyquix
  * @license     GNU General Public License version 2 or later
- * @link        https://github.com/Lyquix/wp_theme_lyquix
+ * @link        https://github.com/Lyquix/wp_theme_lyquix_child
  */
 
 //    .d8888b. 88888888888 .d88888b.  8888888b.   888

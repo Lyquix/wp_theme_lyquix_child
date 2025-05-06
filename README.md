@@ -1,1 +1,1 @@
-# wp_theme_lyquix_child
+# wp_theme_lyquix_child_child
