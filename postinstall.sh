@@ -29,10 +29,14 @@ cd ${SCRIPTDIR}
 PARENTDIR="../lyquix"
 
 # Ensure the required directories exist
-mkdir -p php/custom/templates
 mkdir -p css/custom
+mkdir -p js/custom/scripts
+mkdir -p php/custom/templates
 
 # Check for files that need to be created
+if [ ! -f .htaccess ]; then
+	cp "${PARENTDIR}/.htaccess" .htaccess
+fi
 if [ ! -f custom.php ]; then
 	cp "${PARENTDIR}/custom.dist.php" custom.php
 fi
@@ -45,8 +49,17 @@ fi
 if [ ! -f css/custom/editor.css ]; then
 	echo "/* This file will be overwritten when SCSS is compiled */" > css/custom/editor.css
 fi
+if [ ! -f css/tailwind/presets.js ]; then
+	cp "${PARENTDIR}/css/tailwind/presets.dist.js" css/tailwind/presets.js
+fi
 if [ ! -f css/tailwind/theme.js ]; then
 	cp "${PARENTDIR}/css/tailwind/theme.dist.js" css/tailwind/theme.js
+fi
+if [ ! -f js/scripts.ts ]; then
+	cp "${PARENTDIR}/js/scripts.dist.ts" js/scripts.ts
+fi
+if [ ! -f js/custom/scripts/module.ts ]; then
+	cp "${PARENTDIR}/js/custom/scripts/module.dist.ts" js/custom/scripts/module.ts
 fi
 if [ ! -f php/custom/templates/404.php ]; then
 	cp "${PARENTDIR}/php/custom/templates/404.dist.php" php/custom/templates/404.php
@@ -55,39 +68,24 @@ if [ ! -f php/custom/templates/search.php ]; then
 	cp "${PARENTDIR}/php/custom/templates/search.dist.php" php/custom/templates/search.php
 fi
 
-function handle_files {
-	DIR=$1
-	FILES=("${@:2}")
+for DIRPATH in "${PARENTDIR}/css/lib"/*/; do
+  DIR="$(basename "$DIRPATH")"
 
-	# Check if the directory exists, if not create it
-	if [ ! -d "css/custom/$DIR" ]; then
-		mkdir -p "css/custom/$DIR"
-	fi
+  # Create matching directory under css/custom if missing
+  mkdir -p "css/custom/$DIR"
 
-	for FILE in "${FILES[@]}"; do
-		# Check if the file exists in the css/custom/$DIR directory
-		if [ ! -f "css/custom/$DIR/_$FILE.scss" ]; then
-			# Copy it from the parent theme's css/lib/$DIR directory
-			cp "${PARENTDIR}/css/lib/$DIR/_$FILE.dist.scss" "css/custom/$DIR/_$FILE.scss"
-		fi
-	done
-}
+  # Scan all .dist.scss files in the parent directory
+  for SRCFILE in "$DIRPATH"*.dist.scss; do
+    # Strip .dist from the filename
+    FILENAME="$(basename "$SRCFILE" .dist.scss).scss"
+    TARGET="css/custom/$DIR/$FILENAME"
 
-ABSTRACTS=("index" "mixins" "variables")
-BASE=("forms" "index" "print" "reset" "tables" "typography")
-COMPONENTS=("accordion" "alerts" "banner" "buttons" "cards" "cta" "filters" "gallery" "hero" "index" "logos" "popup" "modal" "slider" "social" "tabs")
-LAYOUTS=("footer" "header" "index" "layout")
-PAGES=("404" "contact" "home" "index" "search")
-THEMES=("index" "theme")
-VENDORS=("index" "swiper")
-
-handle_files "abstracts" "${ABSTRACTS[@]}"
-handle_files "base" "${BASE[@]}"
-handle_files "components" "${COMPONENTS[@]}"
-handle_files "layouts" "${LAYOUTS[@]}"
-handle_files "pages" "${PAGES[@]}"
-handle_files "themes" "${THEMES[@]}"
-handle_files "vendors" "${VENDORS[@]}"
+    # Copy only if it doesn't already exist
+    if [ ! -f "$TARGET" ]; then
+      cp "$SRCFILE" "$TARGET"
+    fi
+  done
+done
 
 cd ${CURRDIR}
 
