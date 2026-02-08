@@ -49,6 +49,9 @@ fi
 if [ ! -f css/custom/editor.css ]; then
 	echo "/* This file will be overwritten when SCSS is compiled */" > css/custom/editor.css
 fi
+if [ ! -f css/tailwind/breakpoints.json ]; then
+	cp "${PARENTDIR}/css/tailwind/breakpoints.dist.json" css/tailwind/breakpoints.json
+fi
 if [ ! -f css/tailwind/presets.js ]; then
 	cp "${PARENTDIR}/css/tailwind/presets.dist.js" css/tailwind/presets.js
 fi
