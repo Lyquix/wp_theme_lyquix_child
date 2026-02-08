@@ -55,6 +55,9 @@ fi
 if [ ! -f css/tailwind/theme.js ]; then
 	cp "${PARENTDIR}/css/tailwind/theme.dist.js" css/tailwind/theme.js
 fi
+if [ ! -f css/tailwind/whitelist.html ]; then
+	echo "<!-- This file will be overwritten when TailwinCSS classes are used in posts -->" >  css/tailwind/whitelist.html
+fi
 if [ ! -f js/scripts.ts ]; then
 	cp "${PARENTDIR}/js/scripts.dist.ts" js/scripts.ts
 fi
@@ -68,6 +71,7 @@ if [ ! -f php/custom/templates/search.php ]; then
 	cp "${PARENTDIR}/php/custom/templates/search.dist.php" php/custom/templates/search.php
 fi
 
+# Copy .dist.scss files from parent theme to custom directory if they don't already exist
 for DIRPATH in "${PARENTDIR}/css/lib"/*/; do
   DIR="$(basename "$DIRPATH")"
 
@@ -87,5 +91,15 @@ for DIRPATH in "${PARENTDIR}/css/lib"/*/; do
   done
 done
 
-cd ${CURRDIR}
+# Copy image files from parent theme to child theme if they don't already exist
+for SRCFILE in "${PARENTDIR}/images/dist/"*; do
+  FILENAME="$(basename "$SRCFILE")"
+  TARGET="images/$FILENAME"
 
+  # Copy only if it doesn't already exist
+  if [ ! -f "$TARGET" ]; then
+    cp "$SRCFILE" "$TARGET"
+  fi
+done
+
+cd ${CURRDIR}
