@@ -43,28 +43,37 @@ gulp.task('compile-css', (done) => {
 		console.log('Running Tailwind CSS (editor styles)...');
 		execSync('tailwindcss -i css/tailwind/editor.css -c css/tailwind/editor.config.js -o css/editor.css', { stdio: 'pipe', maxBuffer: 1024 * 500 });
 
+		// Run the loop synchronously and wait for completion
 		for (let i = 0; i < 5; i++) {
 			const data = fs.readFileSync('css/styles.css', 'utf8');
 			const themeRegex = /theme\s*\(\s*['"][^'"]*['"]\s*\)/g;
 			if (!themeRegex.test(data)) break;
-			exec('npx tailwindcss -i css/styles.css -c css/tailwind/config.js -o css/styles.css');
+			console.log(`Re-running Tailwind (iteration ${i + 1})...`);
+			execSync('tailwindcss -i css/styles.css -c css/tailwind/config.js -o css/styles.css', { stdio: 'pipe', maxBuffer: 1024 * 500 });
 		}
+
+		// Verify theme() functions are resolved before PostCSS
+		const finalCheck = fs.readFileSync('css/styles.css', 'utf8');
+		if (/theme\s*\(\s*['"][^'"]*['"]\s*\)/g.test(finalCheck)) {
+			console.warn('⚠️  Warning: theme() functions still present after iterations');
+		}
+
 		const postCSSPlugins = [
-			cssnano({ preset: 'default' }),
-			autoprefixer()
+			autoprefixer(),
+			cssnano({ preset: 'default' })
 		];
 
-		gulp.src('css/styles.css')
+		return gulp.src('css/styles.css')
 			.pipe(sourcemaps.init())
 			.pipe(postcss(postCSSPlugins))
 			.pipe(rename({ suffix: '.min' }))
 			.pipe(sourcemaps.write('.'))
 			.pipe(gulp.dest('css'))
-			.on('end', () => livereload.reload());
-
-		console.log('\x1b[41m\x1b[37m%s\x1b[0m', '  >>> PAGE RELOADED <<<  ');
-
-		done();
+			.on('end', () => {
+				livereload.reload();
+				console.log('\x1b[41m\x1b[37m%s\x1b[0m', '  >>> PAGE RELOADED <<<  ');
+				done();
+			});
 	} catch (err) {
 		console.error('Error during CSS compilation:');
 		console.log(err);

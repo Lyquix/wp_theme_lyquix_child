@@ -7,7 +7,7 @@ Child theme for the [Lyquix WordPress Theme](https://github.com/Lyquix/wp_theme_
 ## Getting Started
 
 ```bash
-cd wp-content/themes/lyquix_child
+cd wp-content/themes/lyquix-child
 nvm use 18
 bun install    # Installs dependencies and runs postinstall to scaffold files
 bun run watch  # Starts development with auto-compilation and LiveReload
