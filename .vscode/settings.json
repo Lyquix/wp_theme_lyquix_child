@@ -1,116 +1,50 @@
 {
-	"[css]": {
-		"editor.defaultFormatter": "vscode.css-language-features"
-	},
-	"[html]": {
-		"editor.defaultFormatter": "vscode.html-language-features"
-	},
-	"[javascript]": {
-		"editor.defaultFormatter": "vscode.typescript-language-features"
-	},
-	"[json]": {
-		"editor.defaultFormatter": "vscode.json-language-features"
-	},
-	"[jsonc]": {
-		"editor.defaultFormatter": "vscode.json-language-features"
-	},
-	"[scss]": {
-		"editor.defaultFormatter": "vscode.css-language-features"
-	},
-	"css.validate": false,
-	"editor.insertSpaces": false,
-	"editor.tabSize": 2,
-	"editor.renderControlCharacters": false,
-	"editor.renderWhitespace": "all",
-	"editor.rulers": [
-		120
-	],
-	"files.eol": "\n",
-	"files.trimTrailingWhitespace": true,
-	"intelephense.stubs": [
-		"apache",
-		"bcmath",
-		"bz2",
-		"calendar",
-		"com_dotnet",
-		"Core",
-		"ctype",
-		"curl",
-		"date",
-		"dba",
-		"dom",
-		"enchant",
-		"exif",
-		"FFI",
-		"fileinfo",
-		"filter",
-		"fpm",
-		"ftp",
-		"gd",
-		"gettext",
-		"gmp",
-		"hash",
-		"iconv",
-		"imap",
-		"intl",
-		"json",
-		"ldap",
-		"libxml",
-		"mbstring",
-		"meta",
-		"mysqli",
-		"oci8",
-		"odbc",
-		"openssl",
-		"pcntl",
-		"pcre",
-		"PDO",
-		"pdo_ibm",
-		"pdo_mysql",
-		"pdo_pgsql",
-		"pdo_sqlite",
-		"pgsql",
-		"Phar",
-		"posix",
-		"pspell",
-		"random",
-		"readline",
-		"Reflection",
-		"session",
-		"shmop",
-		"SimpleXML",
-		"snmp",
-		"soap",
-		"sockets",
-		"sodium",
-		"SPL",
-		"sqlite3",
-		"standard",
-		"superglobals",
-		"sysvmsg",
-		"sysvsem",
-		"sysvshm",
-		"tidy",
-		"tokenizer",
-		"wordpress",
-		"xml",
-		"xmlreader",
-		"xmlrpc",
-		"xmlwriter",
-		"xsl",
-		"Zend OPcache",
-		"zip",
-		"zlib"
-	],
-	"scss.validate": false,
-	"stylelint.snippet": [
-		"css",
-		"scss"
-	],
-	"stylelint.validate": [
-		"css",
-		"scss"
-	],
-	"terminal.integrated.defaultProfile.windows": "Ubuntu (WSL)",
-	"intelephense.format.braces": "k&r"
+  "editor.insertSpaces": false,
+  "editor.tabSize": 2,
+  "editor.rulers": [120],
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  "[html]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[css]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[scss]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[javascript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[json]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[jsonc]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[php]": { "editor.defaultFormatter": "bmewburn.vscode-intelephense-client" },
+  "[xml]": { "editor.defaultFormatter": "redhat.vscode-xml" },
+  "[shellscript]": { "editor.defaultFormatter": "foxundermoon.shell-format" },
+  "[dockerfile]": { "editor.defaultFormatter": "foxundermoon.shell-format" },
+
+  "prettier.printWidth": 120,
+  "prettier.useTabs": true,
+  "prettier.tabWidth": 2,
+  "prettier.singleQuote": true,
+  "prettier.endOfLine": "lf",
+  "prettier.requireConfig": false,
+
+  "eslint.enable": true,
+  "eslint.run": "onSave",
+  "eslint.probe": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.format.enable": false,
+
+	"security.allowedUNCHosts": [
+		"wsl.localhost"
+  ],
+  "gitlens.ai.model": "vscode",
+  "gitlens.ai.vscode.model": "copilot:gpt-4o-mini",
+  "workbench.colorTheme": "Atom One Dark",
+  "editor.fontSize": 13,
+  "git.autofetch": true
 }

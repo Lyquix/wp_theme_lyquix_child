@@ -4,7 +4,7 @@
 		"bmewburn.vscode-intelephense-client",
 		"dbaeumer.vscode-eslint",
 		"donjayamanne.githistory",
-		"DotJoshJohnson.xml",
+		"redhat.vscode-xml",
 		"EditorConfig.EditorConfig",
 		"eamodio.gitlens",
 		"formulahendry.auto-close-tag",
@@ -16,7 +16,13 @@
 		"nhoizey.gremlins",
 		"ritwickdey.LiveServer",
 		"stylelint.vscode-stylelint",
-		"Vue.volar"
+		"Vue.volar",
+		"esbenp.prettier-vscode",
+		"zwyx.remotetrash",
+		"valeryanm.vscode-phpsab",
+		"davidanson.vscode-markdownlint",
+		"github.copilot-chat",
+		"ms-azuretools.vscode-containers"
 	],
 	"unwantedRecommendations": []
 }
