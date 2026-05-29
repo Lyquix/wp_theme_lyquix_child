@@ -8,6 +8,13 @@
  * A file is a STUB if it only re-exports from the parent (single-line export).
  * For overrides, reports whether the parent module has changed since the
  * override was last updated (based on file modification times).
+ *
+ * @version     3.4.0
+ * @package     wp_theme_lyquix_child
+ * @author      Lyquix
+ * @copyright   Copyright (C) 2015 - 2024 Lyquix
+ * @license     GNU General Public License version 2 or later
+ * @link        https://github.com/Lyquix/wp_theme_lyquix_child
  */
 
 import { readFileSync, readdirSync, statSync } from 'fs';

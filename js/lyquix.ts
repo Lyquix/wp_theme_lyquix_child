@@ -2,6 +2,13 @@
  * lyquix.ts - Child theme entry point for lqx library
  *
  * Mirrors the parent lyquix.ts but imports the child theme's menu override.
+ *
+ * @version     3.4.0
+ * @package     wp_theme_lyquix_child
+ * @author      Lyquix
+ * @copyright   Copyright (C) 2015 - 2024 Lyquix
+ * @license     GNU General Public License version 2 or later
+ * @link        https://github.com/Lyquix/wp_theme_lyquix_child
  */
 
 // Import core functions and variables
@@ -37,7 +44,7 @@ import { testimonial } from '../../lyquix/js/lib/lyquix/testimonial';
 
 declare const lqx;
 
-const version = '3.1.0';
+const version = '3.4.0';
 
 // Initialize library
 const init = (customCfg) => {

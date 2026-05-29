@@ -1,6 +1,6 @@
 # Lyquix WordPress Child Theme
 
-`@version 3.2.0`
+`@version 3.4.0`
 
 Child theme for the [Lyquix WordPress Theme](https://github.com/Lyquix/wp_theme_lyquix). This is where all project-specific customization, styling, scripting, and build tooling lives.
 

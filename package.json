@@ -3,7 +3,7 @@
 		"/**",
 		"* package.json - npm project configuration",
 		"*",
-		"* @version     3.2.0",
+		"* @version     3.4.0",
 		"* @package     wp_theme_lyquix_child",
 		"* @author      Lyquix",
 		"* @copyright   Copyright (C) 2015 - 2024 Lyquix",
@@ -23,7 +23,7 @@
 		"*/"
 	],
 	"name": "lyquix",
-	"version": "3.2.0",
+	"version": "3.4.0",
 	"description": "Lyquix package configuration file",
 	"main": "index.js",
 	"author": "Lyquix",
@@ -76,9 +76,11 @@
 	},
 	"scripts": {
 		"postinstall": "chmod +x ./postinstall.sh && ./postinstall.sh",
-		"watch": "run-p watch:**",
-		"watch:lyquix": "bun build ../lyquix/js/lyquix.ts --outdir ./js --target browser --format iife --watch",
-		"watch:scripts": "bun build js/scripts.ts --outdir ./js --target browser --format iife --watch",
-		"watch:gulp": "gulp"
+		"watch": "run-p watch:lyquix watch:scripts watch:scripts-dev watch:gulp",
+		"watch:lyquix": "bun js/build-lyquix.ts --watch",
+		"watch:scripts": "bun build js/scripts.ts --outfile ./js/scripts.min.js --target browser --format iife --minify --sourcemap=inline --watch",
+		"watch:scripts-dev": "bun build js/scripts.ts --outfile ./js/scripts.js --target browser --format iife --sourcemap=inline --watch",
+		"watch:gulp": "gulp",
+		"check-overrides": "bun js/check-overrides.ts"
 	}
 }
