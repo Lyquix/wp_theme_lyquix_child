@@ -121,9 +121,18 @@ if (isWatch) {
 		}, 100);
 	};
 
-	// Watch child override directory and parent lib directory
-	watch(childLibDir, { recursive: false }, onChange);
-	watch(parentLibDir, { recursive: false }, onChange);
+	// Watch child override directory and parent lib directory.
+	// The child override dir is optional — only watch it if it exists.
+	if (existsSync(childLibDir)) {
+		watch(childLibDir, { recursive: false }, onChange);
+	} else {
+		console.log(`[lyquix] no child override directory (${childLibDir}) — skipping watch`);
+	}
+	if (existsSync(parentLibDir)) {
+		watch(parentLibDir, { recursive: false }, onChange);
+	} else {
+		console.log(`[lyquix] no parent lib directory (${parentLibDir}) — skipping watch`);
+	}
 
 	// Watch lyquix.ts entry point
 	watch(jsDir, { recursive: false }, (event, filename) => {

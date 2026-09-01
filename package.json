@@ -23,7 +23,7 @@
 		"*/"
 	],
 	"name": "lyquix",
-	"version": "3.4.0",
+	"version": "3.5.0",
 	"description": "Lyquix package configuration file",
 	"main": "index.js",
 	"author": "Lyquix",

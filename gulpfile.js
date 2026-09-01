@@ -103,6 +103,11 @@ gulp.task('compile-vue', () => {
 	const componentsPath = 'js/custom/components';
 	const outputPath = 'js';
 
+	if (!fs.existsSync(vuePath)) {
+		console.log(`No ${vuePath} directory — skipping Vue compilation`);
+		return Promise.resolve();
+	}
+
 	const vueApps = fs.readdirSync(vuePath)
 		.filter(f => f.endsWith('.js'))
 		.map(f => ({ name: path.basename(f, '.js'), filePath: path.join(vuePath, f) }));

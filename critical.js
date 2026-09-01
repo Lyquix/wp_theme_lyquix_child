@@ -119,7 +119,11 @@ const criticalCSS = async (criticalCssCfg, baseUrl, credentials) => {
 					console.error(`Failed to generate critical CSS for ${template.url}:`, err);
 					reject(err);
 				} else {
-					fs.appendFileSync(criticalCssPath, output.css);
+					// Normalize relative wp-content paths to site-root-absolute so the
+					// inlined <style> block resolves correctly from any page depth,
+					// including language-prefixed URLs like /ru/ or /zh/.
+					const css = output.css.replace(/url\((\.\.\/)*wp-content\//g, 'url(/wp-content/');
+					fs.appendFileSync(criticalCssPath, css);
 					console.log(`${i + 1}/${criticalCssCfg.templates.length} (${(Date.now() - urlStartTime) / 1000}s): ${template.url}`);
 					resolve(output);
 				}
