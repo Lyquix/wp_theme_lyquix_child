@@ -86,7 +86,7 @@ async function build() {
 			target: 'browser',
 			format: 'iife',
 			minify: true,
-			sourcemap: 'inline',
+			sourcemap: 'none',
 			plugins: [overridePlugin],
 		}),
 	]);
