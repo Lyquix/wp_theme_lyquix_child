@@ -149,7 +149,24 @@ gulp.task('compile-vue', () => {
 
 // Livereload
 gulp.task('livereload', () => {
-	livereload.listen(35729);
+	const lrServer = livereload.listen(35729);
+
+	// tiny-lr writes to the websocket after a browser tab has gone away, which surfaces
+	// as an unhandled EPIPE and kills the watch process. The disconnect is expected, so
+	// swallow write errors from the livereload socket and keep watching.
+	const ignoreSocketError = (err) => {
+		if (err && ['EPIPE', 'ECONNRESET', 'ERR_STREAM_WRITE_AFTER_END'].includes(err.code)) return;
+		console.error('LiveReload error:', err && err.message ? err.message : err);
+	};
+	if (lrServer && typeof lrServer.on === 'function') lrServer.on('error', ignoreSocketError);
+	if (lrServer && lrServer.server && typeof lrServer.server.on === 'function') {
+		lrServer.server.on('error', ignoreSocketError);
+		lrServer.server.on('connection', (socket) => socket.on('error', ignoreSocketError));
+	}
+	process.on('uncaughtException', (err) => {
+		if (err && ['EPIPE', 'ECONNRESET'].includes(err.code)) return ignoreSocketError(err);
+		throw err;
+	});
 
 	// Watch SCSS/PHP/HTML and trigger CSS recompilation
 	gulp.watch([
