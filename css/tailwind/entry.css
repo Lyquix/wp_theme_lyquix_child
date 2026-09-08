@@ -1,0 +1,34 @@
+/**
+ * entry.css - Tailwind v4 preamble
+ *
+ * Prepended to the compiled Sass output by gulpfile.js before the Tailwind pass.
+ * It is not a Sass partial: `@import "tailwindcss"` would be resolved by Sass as a
+ * stylesheet import, so the directive has to be added after Sass has run.
+ *
+ * Tailwind v4 no longer reads `content` or `safelist` from a JS config, so the
+ * sources are declared here with @source. The rest of the configuration (theme
+ * tokens, presets, plugins) still comes from the v3-style config via @config.
+ *
+ * Paths are relative to css/, the directory of the file PostCSS is given.
+ */
+
+@import "tailwindcss";
+
+@config "./tailwind/config.js";
+
+/* Template and script sources scanned for class names */
+@source "../../lyquix/js/*.js";
+@source "../js/*.js";
+@source "../../lyquix/page-templates/*.php";
+@source "../page-templates/*.php";
+@source "../../lyquix/php/**/*.php";
+@source "../php/**/*.php";
+@source "../tribe/**/*.php";
+@source "../tribe-events/**/*.php";
+@source "../custom.php";
+@source "./tailwind/whitelist.html";
+
+/* Classes only present in the database (block settings, editor content) */
+/* Classes that exist only in the database (block settings, editor content) and so
+   cannot be found by scanning files. Add them here per project, e.g.:
+   @source inline("bg-overlay-green p-[5%]"); */

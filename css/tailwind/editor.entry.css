@@ -1,0 +1,27 @@
+/**
+ * editor.entry.css - Tailwind v4 preamble for the block editor stylesheet
+ *
+ * Preflight is deliberately not imported: these styles are injected into the editor
+ * canvas via add_editor_style() and must not reset WordPress's own editor UI.
+ * (Replaces corePlugins.preflight = false from the v3 config.)
+ *
+ * Paths are relative to css/tailwind/, the directory of the file PostCSS is given.
+ */
+
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@config "./editor.config.js";
+
+@source "../../../lyquix/js/*.js";
+@source "../../js/*.js";
+@source "../../../lyquix/page-templates/*.php";
+@source "../../page-templates/*.php";
+@source "../../../lyquix/php/**/*.php";
+@source "../../php/**/*.php";
+@source "../../tribe/**/*.php";
+@source "../../tribe-events/**/*.php";
+@source "../../custom.php";
+@source "./whitelist.html";

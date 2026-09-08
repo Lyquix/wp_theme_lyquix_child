@@ -35,6 +35,7 @@
 		"@rollup/plugin-typescript": "^11.1.6",
 		"@tailwindcss/aspect-ratio": "^0.4.2",
 		"@tailwindcss/container-queries": "^0.1.1",
+		"@tailwindcss/postcss": "^4",
 		"@types/jquery": "^3.5.29",
 		"@types/node": "^20.11.28",
 		"@types/vue": "^2.0.0",
@@ -69,7 +70,7 @@
 		"stylelint-config-standard": "^36.0.0",
 		"stylelint-config-standard-scss": "^13.0.0",
 		"tailwind-layouts": "^0.3.0",
-		"tailwindcss": "^3.4.1",
+		"tailwindcss": "^4",
 		"terser": "^5.29.2",
 		"typescript": "^5.4.2",
 		"vue": "^3.4.21"

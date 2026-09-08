@@ -25,7 +25,7 @@ import fs from 'fs';
 import path from 'path';
 import mergeStream from 'merge-stream';
 import sass from 'sass';
-import tailwindcss from 'tailwindcss';
+import tailwindcss from '@tailwindcss/postcss';
 import postcssLib from 'postcss';
 import livereload from 'gulp-livereload';
 import postcss from 'gulp-postcss';
@@ -37,8 +37,36 @@ import terser from 'gulp-terser';
 
 // Absolute paths required — tailwindcss uses jiti internally which resolves
 // relative paths against its own package directory, not the project CWD
-const tailwindConfigPath = path.resolve('css/tailwind/config.js');
-const tailwindEditorConfigPath = path.resolve('css/tailwind/editor.config.js');
+// Tailwind v4 is configured from CSS: the @import/@config/@source preamble lives in
+// css/tailwind/entry.css and is prepended to the compiled Sass output, because Sass
+// would otherwise try to resolve `@import "tailwindcss"` as a stylesheet of its own.
+const tailwindEntryPath = 'css/tailwind/entry.css';
+const tailwindEditorEntryPath = 'css/tailwind/editor.entry.css';
+
+// CSS only honours @import at the very top of a stylesheet. Tailwind's generated output
+// is prepended ahead of the compiled Sass, which pushes any font @import declared in SCSS
+// below it — the browser then ignores it and the web fonts silently never load.
+// Hoist plain-CSS @import rules back to the top, preserving order and dropping duplicates.
+const hoistImports = (cssText) => {
+	const charsets = [];
+	const imports = [];
+	const seen = new Set();
+
+	// Match whole lines: a Google Fonts URL legitimately contains semicolons
+	// (family=Inter:ital,wght@0,100..900;1,100..900), so stopping at the first one
+	// would never match.
+	const body = cssText.replace(/^[ \t]*@(charset|import)\b[^\n]*;[ \t]*$/gm, (match, kind) => {
+		const rule = match.trim();
+		if (seen.has(rule)) return '';
+		seen.add(rule);
+		(kind === 'charset' ? charsets : imports).push(rule);
+		return '';
+	});
+
+	// @charset must precede everything, then @import, then the rest
+	const head = charsets.slice(0, 1).concat(imports);
+	return head.length ? head.join('\n') + '\n' + body : cssText;
+};
 
 // Compile SCSS and Tailwind CSS
 // Uses multi-pass PostCSS to resolve chained theme() refs in theme.js
@@ -55,14 +83,16 @@ gulp.task('compile-css', async () => {
 		return;
 	}
 
-	// Multi-pass Tailwind: each pass may produce new theme() calls from chained
-	// theme() refs in theme.js values (e.g. 'headings': 'theme("fontFamily.base")')
-	const themeRegex = /theme\s*\(\s*['"][^'"]+['"]\s*\)/;
-	for (let i = 0; i < 5; i++) {
-		const result = await postcssLib([tailwindcss(tailwindConfigPath), autoprefixer()]).process(css, { from: 'css/custom.css' });
-		css = result.css;
-		if (!themeRegex.test(css)) break;
-		console.log(`Resolving nested theme() refs (pass ${i + 2})...`);
+	// Tailwind v4 resolves chained theme() references itself, so the previous
+	// multi-pass PostCSS loop is no longer needed.
+	try {
+		const preamble = fs.readFileSync(tailwindEntryPath, 'utf8');
+		const result = await postcssLib([tailwindcss(), autoprefixer()])
+			.process(preamble + '\n' + css, { from: 'css/custom.css' });
+		css = hoistImports(result.css);
+	} catch (err) {
+		console.error('Tailwind error:', err.message);
+		return;
 	}
 
 	// Write non-minified for local dev (loaded when non_min_css = '1')
@@ -74,11 +104,13 @@ gulp.task('compile-css', async () => {
 	console.log('\x1b[41m\x1b[37m%s\x1b[0m', '  >>> PAGE RELOADED <<<  ');
 	livereload.reload();
 
-	// Editor CSS (single pass — no chained theme() refs expected)
+	// Editor CSS
 	try {
-		const editorCSS = fs.readFileSync('css/tailwind/editor.css', 'utf8');
-		const editorResult = await postcssLib([tailwindcss(tailwindEditorConfigPath), autoprefixer()]).process(editorCSS, { from: 'css/tailwind/editor.css' });
-		fs.writeFileSync('css/editor.css', editorResult.css);
+		const editorPreamble = fs.readFileSync(tailwindEditorEntryPath, 'utf8');
+		const editorCSS = fs.readFileSync('css/tailwind/editor.css', 'utf8').replace(/@tailwind\s+[a-z]+;/g, '');
+		const editorResult = await postcssLib([tailwindcss(), autoprefixer()])
+			.process(editorPreamble + '\n' + editorCSS, { from: 'css/tailwind/editor.css' });
+		fs.writeFileSync('css/editor.css', hoistImports(editorResult.css));
 	} catch (err) {
 		console.error('Editor CSS error:', err.message);
 	}
