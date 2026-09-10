@@ -25,14 +25,31 @@ import { createRequire } from 'module';
 import readline from 'readline';
 import { generate } from 'critical';
 
-// The PostCSS that critical itself is built on
+// The PostCSS that critical itself is built on, and the Lightning CSS that Tailwind builds with
 const postcss = createRequire(import.meta.resolve('critical'))('postcss');
+const lightningcss = createRequire(import.meta.resolve('@tailwindcss/postcss'))('lightningcss');
 
-// Penthouse can't parse native CSS nesting, which Swiper 14 ships and Tailwind 4 emits: it
-// flattens nested rules onto the wrong selectors. Swiper's navigation margin-top landed on
-// .swiper-horizontal and shifted every slider up, and "&:only-child { display: none !important }"
-// hid the whole page. Nested rules only refine states that first paint can do without (hover,
-// disabled, rtl, css-mode), so stylesheets lose them before extraction.
+// Penthouse can't parse native CSS nesting, which Swiper 14 ships and Tailwind 4 emits for every
+// @apply with a breakpoint: it flattens nested rules onto the wrong selectors. Swiper's navigation
+// margin-top landed on .swiper-horizontal and shifted every slider up, and
+// "&:only-child { display: none !important }" hid the whole page. Stylesheets are compiled down to
+// plain rules first, for a browser that predates nesting and media query ranges (Chrome 100).
+const flattenNesting = (css) => {
+	try {
+		return lightningcss.transform({
+			filename: 'stylesheet.css',
+			code: Buffer.from(css),
+			minify: false,
+			errorRecovery: true,
+			targets: { chrome: 100 << 16 }
+		}).code.toString();
+	} catch (error) {
+		return withoutNestedRules(css);
+	}
+};
+
+// Fallback for a stylesheet Lightning CSS can't compile: without its nested rules, first paint
+// misses their hover states and breakpoint styles, but nothing lands on the wrong selector
 const withoutNestedRules = (css) => {
 	try {
 		const root = postcss.parse(css);
@@ -45,11 +62,11 @@ const withoutNestedRules = (css) => {
 	}
 };
 
-// critical downloads every stylesheet with got, so strip them as the responses arrive
-const stripNestedRules = (response) => {
+// critical downloads every stylesheet with got, so flatten them as the responses arrive
+const flattenStylesheets = (response) => {
 	const type = String(response.headers['content-type'] || '');
 	if (typeof response.body === 'string' && (type.includes('text/css') || /\.css(\?|$)/.test(response.url))) {
-		response.body = withoutNestedRules(response.body);
+		response.body = flattenNesting(response.body);
 	}
 	return response;
 };
@@ -212,7 +229,7 @@ async function criticalCSS(criticalCssCfg, config, insecure) {
 		}
 
 		if (insecure) options.request = { https: { rejectUnauthorized: false } };
-		options.request = { ...options.request, hooks: { afterResponse: [stripNestedRules] } };
+		options.request = { ...options.request, hooks: { afterResponse: [flattenStylesheets] } };
 
 		try {
 			const output = await generate(options);
