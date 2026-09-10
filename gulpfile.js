@@ -79,7 +79,10 @@ gulp.task('compile-css', async () => {
 		css = sass.compile('css/custom/custom.scss', { silenceDeprecations: ['global-builtin', 'import'] }).css;
 		fs.writeFileSync('css/custom.css', css);
 	} catch (err) {
+		// A failed one-off build must not exit 0 with the previous styles still in place;
+		// the exit code doesn't stop a running watcher
 		console.error('SASS error:', err.message);
+		process.exitCode = 1;
 		return;
 	}
 
@@ -92,6 +95,7 @@ gulp.task('compile-css', async () => {
 		css = hoistImports(result.css);
 	} catch (err) {
 		console.error('Tailwind error:', err.message);
+		process.exitCode = 1;
 		return;
 	}
 
@@ -113,6 +117,7 @@ gulp.task('compile-css', async () => {
 		fs.writeFileSync('css/editor.css', hoistImports(editorResult.css));
 	} catch (err) {
 		console.error('Editor CSS error:', err.message);
+		process.exitCode = 1;
 	}
 });
 
