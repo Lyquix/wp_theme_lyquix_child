@@ -88,7 +88,7 @@ Options:
   --url=<url>      site to generate from
   --user=<name>    HTTP basic auth user
   --pass=<pass>    HTTP basic auth password
-  --only=<text>    only regenerate templates whose URL contains <text>
+  --only=<text>    only regenerate templates whose URL contains <text> (a full URL matches exactly)
   --insecure       accept self-signed certificates (automatic for .test, .local and localhost)
   --yes, -y        use the saved configuration without asking
 
@@ -180,7 +180,9 @@ async function criticalCSS(criticalCssCfg, config, insecure) {
 	fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
 	const only = option('only');
-	const templates = only ? criticalCssCfg.templates.filter((t) => t.url.includes(only)) : criticalCssCfg.templates;
+	// A full URL selects exactly that template: the home page URL is a prefix of every other
+	const matches = (url) => (/^https?:\/\//.test(only) ? url === only : url.includes(only));
+	const templates = only ? criticalCssCfg.templates.filter((t) => matches(t.url)) : criticalCssCfg.templates;
 	const failed = [];
 
 	for (let i = 0; i < templates.length; i++) {
@@ -198,7 +200,9 @@ async function criticalCSS(criticalCssCfg, config, insecure) {
 			dimensions: criticalCssCfg.viewports,
 			ignoreInlinedStyles: true,
 			penthouse: {
-				blockJSRequests: false
+				blockJSRequests: false,
+				// Pages with sliders or maps can pass penthouse's 30s default on a busy machine
+				timeout: 60000
 			}
 		};
 
