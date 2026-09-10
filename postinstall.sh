@@ -32,6 +32,7 @@ PARENTDIR="../lyquix"
 mkdir -p css/custom
 mkdir -p js/custom/scripts
 mkdir -p php/custom/templates
+mkdir -p images
 
 # Check for files that need to be created
 if [ ! -f .htaccess ]; then
