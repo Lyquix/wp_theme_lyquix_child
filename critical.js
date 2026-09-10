@@ -21,8 +21,28 @@
 //  DO NOT MODIFY THIS FILE!
 
 import fs from 'fs';
+import { createRequire } from 'module';
 import readline from 'readline';
 import { generate } from 'critical';
+
+// The PostCSS that critical itself is built on
+const postcss = createRequire(import.meta.resolve('critical'))('postcss');
+
+// Swiper 14 ships native CSS nesting, and critical flattens nested rules into top-level
+// selectors starting with "&". Browsers resolve a top-level "&" to the root element, so
+// "&:only-child { display: none !important }" hides the whole page. Rules still nested
+// inside a parent rule are valid and kept.
+const dropFlattenedNesting = (css) => {
+	const root = postcss.parse(css);
+	root.walkRules((rule) => {
+		for (let parent = rule.parent; parent; parent = parent.parent) if (parent.type === 'rule') return;
+		if (!rule.selector.includes('&')) return;
+		const selectors = rule.selectors.filter((selector) => !selector.includes('&'));
+		if (selectors.length) rule.selectors = selectors;
+		else rule.remove();
+	});
+	return root.toString();
+};
 
 const CONFIG_FILE = './critical.json';
 const OUTPUT_DIR = './css/critical';
@@ -170,7 +190,7 @@ async function criticalCSS(criticalCssCfg, config, insecure) {
 			// Normalize relative wp-content paths to site-root-absolute so the inlined <style>
 			// block resolves correctly from any page depth, including language-prefixed URLs
 			// like /ru/ or /zh/.
-			const css = output.css.replace(/url\((\.\.\/)*wp-content\//g, 'url(/wp-content/');
+			const css = dropFlattenedNesting(output.css).replace(/url\((\.\.\/)*wp-content\//g, 'url(/wp-content/');
 			fs.writeFileSync(file, css);
 			console.log(`${i + 1}/${templates.length} (${(Date.now() - started) / 1000}s): ${template.url}`);
 		} catch (error) {
