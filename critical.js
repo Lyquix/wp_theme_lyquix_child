@@ -32,17 +32,38 @@ const lightningcss = createRequire(import.meta.resolve('@tailwindcss/postcss'))(
 // Penthouse can't parse native CSS nesting, which Swiper 14 ships and Tailwind 4 emits for every
 // @apply with a breakpoint: it flattens nested rules onto the wrong selectors. Swiper's navigation
 // margin-top landed on .swiper-horizontal and shifted every slider up, and
-// "&:only-child { display: none !important }" hid the whole page. Stylesheets are compiled down to
-// plain rules first, for a browser that predates nesting and media query ranges (Chrome 100).
+// "&:only-child { display: none !important }" hid the whole page.
+//
+// Only the rules that actually contain nested rules are compiled: a whole-file Lightning CSS pass
+// rewrites selectors as well, splitting `::file-selector-button` out of Tailwind's universal reset
+// and writing `::after` as `:after`. That made the reset rule and the theme's own universal rules
+// collide, and critical's CleanCSS pass then dropped one of them as a duplicate, taking
+// `margin: 0; padding: 0; border: 0` with it: every list got the browser's 16px margins and the
+// desktop first paint came out worse than with no critical CSS at all.
 const flattenNesting = (css) => {
 	try {
-		return lightningcss.transform({
-			filename: 'stylesheet.css',
-			code: Buffer.from(css),
-			minify: false,
-			errorRecovery: true,
-			targets: { chrome: 100 << 16 }
-		}).code.toString();
+		const root = postcss.parse(css);
+		const hasNestedRules = (node) => node.nodes && node.nodes.some((child) => child.type === 'rule'
+			|| (child.type === 'atrule' && child.nodes && child.nodes.length));
+		const candidates = [];
+		root.walkRules((rule) => {
+			if (!hasNestedRules(rule)) return;
+			for (let parent = rule.parent; parent && parent.type !== 'root'; parent = parent.parent) {
+				if (candidates.includes(parent)) return;
+			}
+			candidates.push(rule);
+		});
+		for (const rule of candidates) {
+			const flattened = lightningcss.transform({
+				filename: 'fragment.css',
+				code: Buffer.from(rule.toString()),
+				minify: false,
+				errorRecovery: true,
+				include: lightningcss.Features.Nesting
+			}).code.toString();
+			rule.replaceWith(...postcss.parse(flattened).nodes);
+		}
+		return root.toString();
 	} catch (error) {
 		return withoutNestedRules(css);
 	}
