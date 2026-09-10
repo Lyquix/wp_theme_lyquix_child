@@ -17,12 +17,13 @@
 
 @config "./editor.config.js";
 
-/* Same hover behaviour and transition defaults as entry.css */
+/* Same hover behaviour, transition defaults and 2xl breakpoint as entry.css */
 @custom-variant hover (&:hover);
 
 @theme {
 	--default-transition-duration: 150ms;
 	--default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	--breakpoint-2xl: 1536px;
 }
 
 @source "../../../lyquix/js/*.js";
@@ -35,3 +36,6 @@
 @source "../../tribe-events/**/*.php";
 @source "../../custom.php";
 @source "./whitelist.html";
+
+/* Layout block options the parent assembles at runtime, as in entry.css */
+@source inline("cluster-l_center sidebar-l_no-stretch sidebar-l-end");

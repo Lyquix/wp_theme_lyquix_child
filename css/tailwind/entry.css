@@ -40,6 +40,9 @@
 @theme {
 	--default-transition-duration: 150ms;
 	--default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	/* breakpoints.json stops at xl, so 2xl is Tailwind's default: 1536px in v3, but 96rem in v4 (960px
+	   with the theme's 10px root), sorted after the px breakpoints where it caps .container at 96rem */
+	--breakpoint-2xl: 1536px;
 }
 
 *,
@@ -87,6 +90,14 @@ textarea::placeholder {
 	outline-offset: -2px;
 }
 
+/* v4 makes every form control transparent; v3 only reset buttons and left fields the browser's
+   background */
+input:where(:not([type="button"], [type="reset"], [type="submit"], [type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"], [type="image"])),
+select,
+textarea {
+	background-color: Field;
+}
+
 /* Template and script sources scanned for class names */
 @source "../../lyquix/js/*.js";
 @source "../js/*.js";
@@ -99,7 +110,11 @@ textarea::placeholder {
 @source "../custom.php";
 @source "./tailwind/whitelist.html";
 
-/* Classes only present in the database (block settings, editor content) */
+/* Layout block options the parent assembles at runtime (get_tailwind_classes() in php/layouts.php).
+   v3 emitted a plugin rule when any class in its selector was found, so .cluster-l alone brought
+   .cluster-l_center.cluster-l; v4 needs the option classes themselves */
+@source inline("cluster-l_center sidebar-l_no-stretch sidebar-l-end");
+
 /* Classes that exist only in the database (block settings, editor content) and so
    cannot be found by scanning files. Add them here per project, e.g.:
    @source inline("bg-overlay-green p-[5%]"); */
