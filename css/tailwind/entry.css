@@ -13,20 +13,79 @@
  */
 
 /*
- * `@import "tailwindcss"` would put the utilities in a cascade layer, while the Sass output
- * that follows this preamble is unlayered. Unlayered styles beat any layer whatever their
- * specificity, so an element rule like `h2 { color }` would win over `text-white` on the
- * heading itself. Utilities are imported unlayered instead, ahead of the Sass output: the
- * Tailwind 3 cascade these styles were written for, specificity first and then source order.
- * Theme variables and preflight keep the layers `@import "tailwindcss"` gives them.
+ * Tailwind 3 parity. Tailwind 3 compiled everything unlayered, and the Sass output that follows
+ * this preamble is unlayered too. Unlayered styles beat any cascade layer whatever their
+ * specificity, so the v4 default (`@import "tailwindcss"`, all layered) lets element rules like
+ * `h2 { color }` override `text-white`, and WordPress's zero-specificity `:where()` styles override
+ * preflight. Preflight and utilities are imported unlayered instead, ahead of the Sass output:
+ * specificity first, then source order, as in Tailwind 3. Only the theme variables keep their layer.
+ *
+ * `source(none)` scans only the @source paths below, like v3's `content`; automatic detection would
+ * generate utilities from any matching word anywhere in the child theme.
  */
 @layer theme, base, components, utilities;
 
 @import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/preflight.css" layer(base);
-@import "tailwindcss/utilities.css";
+@import "tailwindcss/preflight.css";
+@import "tailwindcss/utilities.css" source(none);
 
 @config "./tailwind/config.js";
+
+/* v3 hover: plain :hover, so tap-to-reveal keeps working on touch devices (v4 limits hover: to
+   devices that can hover) */
+@custom-variant hover (&:hover);
+
+/* Defaults Tailwind 4 changed, or never emits when the config comes through @config, restated with
+   the values Tailwind 3 compiled in */
+@theme {
+	--default-transition-duration: 150ms;
+	--default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*,
+::before,
+::after,
+::backdrop,
+::file-selector-button {
+	border-color: #e5e7eb;
+}
+
+/* v4 resets margins with `*`, which WordPress's `:where(figure) { margin: 0 0 1em }` beats */
+blockquote,
+dl,
+dd,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hr,
+figure,
+p,
+pre {
+	margin: 0;
+}
+
+button,
+[role="button"] {
+	cursor: pointer;
+}
+
+:disabled {
+	cursor: default;
+}
+
+input::placeholder,
+textarea::placeholder {
+	opacity: 1;
+	color: #9ca3af;
+}
+
+[type="search"] {
+	-webkit-appearance: textfield;
+	outline-offset: -2px;
+}
 
 /* Template and script sources scanned for class names */
 @source "../../lyquix/js/*.js";

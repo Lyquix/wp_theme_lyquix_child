@@ -11,11 +11,19 @@
 @layer theme, base, components, utilities;
 
 @import "tailwindcss/theme.css" layer(theme);
-/* Unlayered for the same reason as entry.css: editor.css follows unlayered and would
-   otherwise override every utility regardless of specificity */
-@import "tailwindcss/utilities.css";
+/* Unlayered and limited to the @source paths for the same reasons as entry.css: editor.css
+   follows unlayered and would otherwise override every utility regardless of specificity */
+@import "tailwindcss/utilities.css" source(none);
 
 @config "./editor.config.js";
+
+/* Same hover behaviour and transition defaults as entry.css */
+@custom-variant hover (&:hover);
+
+@theme {
+	--default-transition-duration: 150ms;
+	--default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
 
 @source "../../../lyquix/js/*.js";
 @source "../../js/*.js";

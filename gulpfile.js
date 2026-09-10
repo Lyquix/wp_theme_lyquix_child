@@ -24,7 +24,7 @@ import gulp from 'gulp';
 import fs from 'fs';
 import path from 'path';
 import mergeStream from 'merge-stream';
-import sass from 'sass';
+import * as sass from 'sass';
 import tailwindcss from '@tailwindcss/postcss';
 import postcssLib from 'postcss';
 import livereload from 'gulp-livereload';
