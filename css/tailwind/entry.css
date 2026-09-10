@@ -12,7 +12,19 @@
  * Paths are relative to css/, the directory of the file PostCSS is given.
  */
 
-@import "tailwindcss";
+/*
+ * `@import "tailwindcss"` would put the utilities in a cascade layer, while the Sass output
+ * that follows this preamble is unlayered. Unlayered styles beat any layer whatever their
+ * specificity, so an element rule like `h2 { color }` would win over `text-white` on the
+ * heading itself. Utilities are imported unlayered instead, ahead of the Sass output: the
+ * Tailwind 3 cascade these styles were written for, specificity first and then source order.
+ * Theme variables and preflight keep the layers `@import "tailwindcss"` gives them.
+ */
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
 
 @config "./tailwind/config.js";
 

@@ -11,7 +11,9 @@
 @layer theme, base, components, utilities;
 
 @import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/utilities.css" layer(utilities);
+/* Unlayered for the same reason as entry.css: editor.css follows unlayered and would
+   otherwise override every utility regardless of specificity */
+@import "tailwindcss/utilities.css";
 
 @config "./editor.config.js";
 
