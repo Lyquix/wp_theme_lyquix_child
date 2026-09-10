@@ -28,10 +28,34 @@ import { generate } from 'critical';
 // The PostCSS that critical itself is built on
 const postcss = createRequire(import.meta.resolve('critical'))('postcss');
 
-// Swiper 14 ships native CSS nesting, and critical flattens nested rules into top-level
-// selectors starting with "&". Browsers resolve a top-level "&" to the root element, so
-// "&:only-child { display: none !important }" hides the whole page. Rules still nested
-// inside a parent rule are valid and kept.
+// Penthouse can't parse native CSS nesting, which Swiper 14 ships and Tailwind 4 emits: it
+// flattens nested rules onto the wrong selectors. Swiper's navigation margin-top landed on
+// .swiper-horizontal and shifted every slider up, and "&:only-child { display: none !important }"
+// hid the whole page. Nested rules only refine states that first paint can do without (hover,
+// disabled, rtl, css-mode), so stylesheets lose them before extraction.
+const withoutNestedRules = (css) => {
+	try {
+		const root = postcss.parse(css);
+		root.walk((node) => {
+			if ((node.type === 'rule' || node.type === 'atrule') && node.parent.type === 'rule') node.remove();
+		});
+		return root.toString();
+	} catch (error) {
+		return css;
+	}
+};
+
+// critical downloads every stylesheet with got, so strip them as the responses arrive
+const stripNestedRules = (response) => {
+	const type = String(response.headers['content-type'] || '');
+	if (typeof response.body === 'string' && (type.includes('text/css') || /\.css(\?|$)/.test(response.url))) {
+		response.body = withoutNestedRules(response.body);
+	}
+	return response;
+};
+
+// Safety net: anything nested that still gets through comes out as selectors starting with "&",
+// which browsers resolve to the root element. Rules still inside a parent rule are valid and kept.
 const dropFlattenedNesting = (css) => {
 	const root = postcss.parse(css);
 	root.walkRules((rule) => {
@@ -184,6 +208,7 @@ async function criticalCSS(criticalCssCfg, config, insecure) {
 		}
 
 		if (insecure) options.request = { https: { rejectUnauthorized: false } };
+		options.request = { ...options.request, hooks: { afterResponse: [stripNestedRules] } };
 
 		try {
 			const output = await generate(options);
